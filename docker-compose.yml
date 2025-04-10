@@ -7,7 +7,7 @@ services:
       - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/config/traefik.yaml:/etc/traefik/traefik.yaml
+      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml
       - ./traefik/config:/etc/traefik/config
       - ./traefik/acme:/etc/traefik/acme
     labels:
@@ -22,8 +22,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
-    ports:
-      - 5173:80
     env_file:
       - ./frontend/.env
     labels:
@@ -46,8 +44,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
-    ports:
-      - 8010:8000
     volumes:
       - ./backend/dist:/app/dist
       - postgres_data:/var/lib/postgresql/data
@@ -57,12 +53,12 @@ services:
       - "traefik.http.routers.backend.rule=Host(`michaeloxo.tech`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.middlewares=todos-strip-prefix@file,global-middleware@file"
+      - "traefik.http.routers.backend.middlewares=global-middleware@file"
       # for /docs
       - "traefik.http.routers.backend-docs.rule=Host(`michaeloxo.tech`) && PathPrefix(`/docs`)"
       - "traefik.http.routers.backend-docs.entrypoints=websecure"
       - "traefik.http.routers.backend-docs.tls=true"
-      - "traefik.http.routers.backend-docs.middlewares=todos-strip-prefix@file,global-middleware@file"
+      - "traefik.http.routers.backend-docs.middlewares=global-middleware@file"
       # shared configuration
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
     env_file:

@@ -34,3 +34,4 @@ tmp/
 
 # Docker files
 .dockerignore 
+traefik/acme/acme.json
