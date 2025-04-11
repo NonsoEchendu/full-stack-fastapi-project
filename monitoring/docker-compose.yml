@@ -1,14 +1,20 @@
 services:
   cadvisor:
-    image: google/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
+    labels:
+      - "traefik.enable=true"
+      # for /prometheus
+      - "traefik.http.routers.cadvisor.rule=Host(`michaeloxo.tech`) && PathPrefix(`/cadvisor`)"
+      - "traefik.http.routers.cadvisor.entrypoints=websecure"
+      - "traefik.http.routers.cadvisor.tls=true"
+      - "traefik.http.routers.cadvisor.middlewares=global-middleware@file"
+      - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
     networks:
       - app-network
     restart: unless-stopped
@@ -16,6 +22,7 @@ services:
       - frontend
       - backend
       - db
+      - adminer
 
   prometheus:
     image: prom/prometheus:latest
@@ -79,16 +86,14 @@ services:
       - grafana_data:/var/lib/grafana
     labels:
       - "traefik.enable=true"
-      # for /prometheus
+      # for /grafana
       - "traefik.http.routers.grafana.rule=Host(`michaeloxo.tech`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.routers.grafana.middlewares=global-middleware@file"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-    ports:
-      - 3000:3000
     environment:
-      - GF_SERVER_ROOT_URL=http://grafana:3000
+      - GF_SERVER_ROOT_URL=http://grafana:3000/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     networks:
       - app-network
@@ -102,3 +107,4 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+
