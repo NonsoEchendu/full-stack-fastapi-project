@@ -106,7 +106,7 @@ services:
       - "traefik.http.routers.adminer-domain.tls=true"
       - "traefik.http.routers.adminer-domain.tls.certresolver=myresolver"
       - "traefik.http.routers.adminer-domain.middlewares=global-middleware@file"
-      - "traefik.http.services.adminer-domain.loadbalancer.server.port=8085"
+      - "traefik.http.services.adminer-domain.loadbalancer.server.port=8080"
     networks:
       - app-network
     depends_on:
