@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm run build
 FROM nginx:alpine AS production
 
 # Copy the static build files from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy our custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
