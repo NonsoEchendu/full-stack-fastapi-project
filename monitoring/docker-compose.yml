@@ -23,6 +23,12 @@ services:
       - backend
       - db
       - adminer
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 8080 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   prometheus:
     image: prom/prometheus:latest
@@ -46,6 +52,12 @@ services:
     restart: unless-stopped
     depends_on:
       - cadvisor
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 9090 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   loki:
     image: grafana/loki:latest
@@ -57,6 +69,12 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 3100 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   promtail:
     image: grafana/promtail:latest
@@ -78,6 +96,12 @@ services:
       - backend
       - db
       - adminer
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep promtail | grep -v grep || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   grafana:
     image: grafana/grafana:latest
@@ -103,6 +127,12 @@ services:
       - cadvisor
       - loki
       - promtail
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 3000 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
 volumes:
   prometheus_data:
