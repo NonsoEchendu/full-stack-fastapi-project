@@ -25,27 +25,32 @@ http:
         accessControlAllowCredentials: true
         accessControlMaxAge: 100
         addVaryHeader: true
-    
+
     api-strip-prefix:
       stripPrefix:
         prefixes:
           - "/api"
-    
+
     docs-strip-prefix:
       stripPrefix:
         prefixes:
           - "/docs"
-    
+
     prometheus-strip-prefix:
       stripPrefix:
         prefixes:
           - "/prometheus"
-    
+
     grafana-strip-prefix:
       stripPrefix:
         prefixes:
           - "/grafana"
-    
+
+    cadvisor-strip-prefix:
+      stripPrefix:
+        prefixes:
+          - "/cadvisor"
+
     global-middleware:
       chain:
         middlewares:

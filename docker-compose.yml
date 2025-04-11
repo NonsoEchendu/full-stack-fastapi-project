@@ -19,6 +19,12 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 80 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
   
   frontend:
     build:
@@ -41,6 +47,12 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep nginx | grep -v grep || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   backend:
     build:
@@ -74,6 +86,12 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/docs').getcode() == 200 else 1)"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:13
@@ -85,10 +103,11 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
+      start_period: 10s
     ports:
       - 5432:5432
     networks:
@@ -111,6 +130,12 @@ services:
       - app-network
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 8080 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   app-network:
