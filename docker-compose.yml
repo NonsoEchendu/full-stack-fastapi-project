@@ -79,8 +79,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - POSTGRES_SERVER=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_SERVER=${POSTGRES_SERVER}
+      - POSTGRES_PORT=
     networks:
       - app-network
     restart: unless-stopped
