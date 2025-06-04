@@ -76,3 +76,6 @@ coverage.xml
 # --- Misc ---
 *.orig
 *~
+
+# --- Kubernetes ---
+k8s-manifests/infra/postgres-secret.yml
