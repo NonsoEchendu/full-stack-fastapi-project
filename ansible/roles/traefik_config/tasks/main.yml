@@ -1,0 +1,16 @@
+---
+- name: Ensure Traefik static config directory exists on server
+  ansible.builtin.file:
+    path: "{{ app_base_dir }}/traefik"
+    state: directory
+    mode: '0755'
+
+- name: Synchronize Traefik static configuration files (traefik.yaml, config/*)
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/traefik/" 
+    dest: "{{ app_base_dir }}/traefik/" 
+    mode: push
+    archive: yes 
+    delete: yes
+    rsync_opts:
+      - "--exclude=acme/"

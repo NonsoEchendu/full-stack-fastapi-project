@@ -32,6 +32,45 @@ tmp/
 *.sublime-workspace
 *.sublime-project
 
-# Docker files
-.dockerignore 
-traefik/acme/acme.json
+# --- Ansible ---
+*.retry
+ansible/hosts
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# --- Poetry ---
+.poetry/
+# poetry.lock  # Uncomment if you don’t want to track lockfile
+
+# --- Docker ---
+docker-compose.override.yml
+**/.docker/
+**/volumes/
+
+# --- Terraform ---
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform/
+terraform/terraform.tfvars
+terraform/crash.log
+
+# --- Frontend (Vite) ---
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+
+# --- Testing ---
+.pytest_cache/
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+
+# --- Misc ---
+*.orig
+*~

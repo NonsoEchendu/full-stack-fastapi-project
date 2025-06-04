@@ -1,0 +1,11 @@
+---
+- name: Start Docker service
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Update apt cache post repo add # New Handler
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"

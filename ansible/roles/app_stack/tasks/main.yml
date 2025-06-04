@@ -1,0 +1,61 @@
+---
+- name: Ensure application deployment directory exists on server
+  ansible.builtin.file:
+    path: "{{ app_stack_config_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure 'frontend' subdirectory exists within app_stack_config_dir for .env file
+  ansible.builtin.file:
+    path: "{{ app_stack_config_dir }}/frontend" 
+    state: directory
+    mode: '0755'
+
+- name: Ensure 'backend' subdirectory exists within app_stack_config_dir for .env file
+  ansible.builtin.file:
+    path: "{{ app_stack_config_dir }}/backend" 
+    state: directory
+    mode: '0755'
+
+- name: Synchronize main docker-compose.yml
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/docker-compose.yml"
+    dest: "{{ app_stack_config_dir }}/docker-compose.yml"
+    mode: push
+
+- name: Synchronize frontend .env file
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/frontend/.env"
+    dest: "{{ app_stack_config_dir }}/frontend/.env"
+    mode: push
+  when: lookup('file', local_project_root + '/frontend/.env', errors='ignore')
+
+- name: Synchronize backend .env file
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/backend/.env"
+    dest: "{{ app_stack_config_dir }}/backend/.env"
+    mode: push
+  when: lookup('file', local_project_root + '/backend/.env', errors='ignore')
+
+- name: Ensure previous main application stack is down (docker compose down)
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_stack_config_dir }}"
+    state: absent
+
+- name: Deploy main application stack using Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_stack_config_dir }}"
+    state: present
+    pull: always
+    recreate: auto
+    remove_orphans: yes
+  environment:
+    DOMAIN_NAME: "{{ domain_name }}"
+  register: app_compose_result
+
+
+- name: Show app stack docker compose output
+  ansible.builtin.debug:
+    var: app_compose_result
+  when: app_compose_result is defined
+

@@ -1,0 +1,61 @@
+---
+- name: Ensure monitoring stack config directory exists on server
+  ansible.builtin.file:
+    path: "{{ monitoring_stack_config_dir }}"
+    state: directory
+    mode: '0755'
+
+
+- name: Synchronize monitoring docker-compose.yml
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/monitoring/docker-compose.yml"
+    dest: "{{ monitoring_stack_config_dir }}/docker-compose.yml"
+    mode: push
+
+
+- name: Synchronize Prometheus configuration
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/monitoring/prometheus/"
+    dest: "{{ monitoring_stack_config_dir }}/prometheus/"
+    mode: push
+    archive: yes
+    delete: yes
+
+
+- name: Synchronize Loki configuration
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/monitoring/loki/"
+    dest: "{{ monitoring_stack_config_dir }}/loki/"
+    mode: push
+    archive: yes
+    delete: yes
+
+- name: Synchronize Promtail configuration
+  ansible.posix.synchronize:
+    src: "{{ local_project_root }}/monitoring/promtail/"
+    dest: "{{ monitoring_stack_config_dir }}/promtail/"
+    mode: push
+    archive: yes
+    delete: yes
+
+- name: Ensure previous monitoring stack is down (docker compose down)
+  community.docker.docker_compose_v2:
+    project_src: "{{ monitoring_stack_config_dir }}"
+    state: absent
+
+- name: Deploy monitoring application stack using Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ monitoring_stack_config_dir }}"
+    state: present
+    pull: always
+    recreate: auto
+    remove_orphans: yes
+  environment:
+    DOMAIN_NAME: "{{ domain_name }}"
+  register: app_compose_result
+
+
+- name: Show Monitoring Stack Docker Compose output
+  ansible.builtin.debug:
+    var: monitoring_compose_result
+  when: monitoring_compose_result is defined

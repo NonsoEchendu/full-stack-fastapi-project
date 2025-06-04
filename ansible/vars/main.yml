@@ -1,0 +1,8 @@
+local_project_root: ".."
+app_base_dir: "/opt/appdata"
+
+app_stack_config_dir: "{{ app_base_dir }}/main_app"
+
+monitoring_stack_config_dir: "{{ app_base_dir }}/monitoring_app"
+
+docker_shared_network: "app-network"
