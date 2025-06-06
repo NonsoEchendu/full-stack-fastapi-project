@@ -79,3 +79,4 @@ coverage.xml
 
 # --- Kubernetes ---
 k8s-manifests/infra/postgres-secret.yml
+k8s-manifests/apps/backend-config-secret.yml
